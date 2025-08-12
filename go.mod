@@ -1,4 +1,4 @@
-module github.com/print-engine/utils-golang
+module github.com/print-engine/ieos-golang-utils
 
 go 1.21.6
 
