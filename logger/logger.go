@@ -154,7 +154,11 @@ type LogEntryPayload struct {
 	Invoker     string        `json:"invoker,omitempty"`
 	Message     string        `json:"message"`
 	ExecutionID string        `json:"execution_id,omitempty"`
-	DataObject  []interface{} `json:"data_object,omitempty"`
+    // DataObject holds additional structured data. If a single item was
+    // provided, this will be that item directly; if multiple items were
+    // provided, this will be an array. When no items are provided it is
+    // omitted.
+    DataObject  interface{}   `json:"data_object,omitempty"`
 }
 
 func (c *CloudLogger) Debug(ctx context.Context, r *http.Request, message string, data ...interface{}) {
@@ -237,15 +241,15 @@ func (c *CloudLogger) log(ctx context.Context, sev logging.Severity, r *http.Req
 // normalizeData ensures JSON-friendly payloads. In particular, error values
 // are converted to their Error() string, because the default json.Marshal on
 // concrete error types usually results in an empty object.
-func normalizeData(items []interface{}) []interface{} {
+func normalizeData(items []interface{}) interface{} {
     if len(items) == 0 {
         return nil
     }
-    out := make([]interface{}, 0, len(items))
+    normalizedItems := make([]interface{}, 0, len(items))
     for _, it := range items {
         switch v := it.(type) {
         case error:
-            out = append(out, v.Error())
+            normalizedItems = append(normalizedItems, v.Error())
             continue
         }
 
@@ -263,13 +267,16 @@ func normalizeData(items []interface{}) []interface{} {
                 Type  string      `json:"type"`
                 Value interface{} `json:"value"`
             }{Type: typeName, Value: it}
-            out = append(out, wrapped)
+            normalizedItems = append(normalizedItems, wrapped)
             continue
         }
 
-        out = append(out, it)
+        normalizedItems = append(normalizedItems, it)
     }
-    return out
+    if len(normalizedItems) == 1 {
+        return normalizedItems[0]
+    }
+    return normalizedItems
 }
 
 func extractExecutionID(r *http.Request, keys []string) string {
