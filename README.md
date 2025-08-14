@@ -1,4 +1,4 @@
-# utils-golang
+# ieos-golang-utils
 
 Reusable Go utilities. Currently includes:
 
@@ -7,13 +7,13 @@ Reusable Go utilities. Currently includes:
 ## Install
 
 ```bash
-go get github.com/print-engine/utils-golang@latest
+go get github.com/print-engine/ieos-golang-utils@latest
 ```
 
 Or pin a version after tagging a release (recommended):
 
 ```bash
-go get github.com/print-engine/utils-golang@v0.1.0
+go get github.com/print-engine/ieos-golang-utils@v0.1.2
 ```
 
 ## logger
