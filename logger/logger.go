@@ -56,6 +56,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 )
@@ -245,9 +246,28 @@ func normalizeData(items []interface{}) []interface{} {
         switch v := it.(type) {
         case error:
             out = append(out, v.Error())
-        default:
-            out = append(out, it)
+            continue
         }
+
+        // Add struct type information when the item is a struct or pointer to struct
+        t := reflect.TypeOf(it)
+        for t != nil && t.Kind() == reflect.Ptr {
+            t = t.Elem()
+        }
+        if t != nil && t.Kind() == reflect.Struct {
+            typeName := t.Name()
+            if typeName == "" { // anonymous struct
+                typeName = "struct"
+            }
+            wrapped := struct {
+                Type  string      `json:"type"`
+                Value interface{} `json:"value"`
+            }{Type: typeName, Value: it}
+            out = append(out, wrapped)
+            continue
+        }
+
+        out = append(out, it)
     }
     return out
 }
