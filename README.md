@@ -2,7 +2,7 @@
 
 Reusable Go utilities. Currently includes:
 
-- `logv2`: Lightweight Google Cloud Logging client for Cloud Functions and services
+- `logger`: Lightweight Google Cloud Logging client for Cloud Functions and services
 
 ## Install
 
@@ -16,17 +16,17 @@ Or pin a version after tagging a release (recommended):
 go get github.com/print-engine/utils-golang@v0.1.0
 ```
 
-## logv2
+## logger
 
 A small, reusable Google Cloud Logging client for Go. It reuses a single `logging.Client`, supports request correlation (trace and execution ID), structured payloads, and optional notifier hooks.
 
 ### Quick start (Cloud Function HTTP)
 
 ```go
-package logv2test
+package loggertest
 
 import (
-    v2 "github.com/print-engine/utils-golang/logv2"
+    logger "github.com/print-engine/ieos-golang-utils/logger"
     "cloud.google.com/go/logging"
     "context"
     "fmt"
@@ -34,19 +34,19 @@ import (
     "os"
 )
 
-// LogV2Test is the HTTP entrypoint for a Cloud Function
-func LogV2Test(w http.ResponseWriter, r *http.Request) {
+// LoggerTest is the HTTP entrypoint for a Cloud Function
+func LoggerTest(w http.ResponseWriter, r *http.Request) {
     ctx := context.Background()
 
-    lg, err := v2.New(ctx,
-        v2.WithInvoker("logv2-test"),
-        v2.WithLogName("LogV2_Test"),
-        // v2.WithProjectID(os.Getenv("GOOGLE_CLOUD_PROJECT")), // optional; auto-detected if omitted
-        v2.WithCommonLabels(map[string]string{
-            "service": "logv2-test",
+    lg, err := logger.New(ctx,
+        logger.WithInvoker("logger-test"),
+        logger.WithLogName("Logger_Test"),
+        // logger.WithProjectID(os.Getenv("GOOGLE_CLOUD_PROJECT")), // optional; auto-detected if omitted
+        logger.WithCommonLabels(map[string]string{
+            "service": "logger-test",
             "env":     os.Getenv("ENVIRONMENT"),
         }),
-        // v2.WithNotifier(mySlackNotifier{}, logging.Error), // optional
+        // logger.WithNotifier(mySlackNotifier{}, logging.Error), // optional
     )
     if err != nil {
         fmt.Fprintf(w, "failed to init logger: %v", err)
@@ -69,7 +69,7 @@ func LogV2Test(w http.ResponseWriter, r *http.Request) {
     w.Write([]byte(`{"ok": true}`))
 }
 
-// Example notifier; implements v2.Notifier
+// Example notifier; implements logger.Notifier
 type mySlackNotifier struct{}
 
 func (mySlackNotifier) Notify(ctx context.Context, severity logging.Severity, executionID string, message string, payload any) {
@@ -84,11 +84,11 @@ func (mySlackNotifier) Notify(ctx context.Context, severity logging.Severity, ex
   - Example curl:
     ```bash
     curl -H 'X-Cloud-Trace-Context: 105445aa7843bc8bf206b120001000/1;o=1' \
-      https://YOUR_REGION-YOUR_PROJECT.cloudfunctions.net/LogV2Test
+      https://YOUR_REGION-YOUR_PROJECT.cloudfunctions.net/LoggerTest
     ```
 - Project ID must be known to include the `trace` field in Cloud Logging:
   - Set `GOOGLE_CLOUD_PROJECT`, or
-  - Use `v2.WithProjectID("your-project-id")`, or
+  - Use `logger.WithProjectID("your-project-id")`, or
   - Let the logger auto-detect on GCE.
 
 ### Options

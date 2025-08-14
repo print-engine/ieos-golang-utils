@@ -1,4 +1,4 @@
-// Package logv2 provides a small, reusable Google Cloud Logging client
+// Package logger provides a small, reusable Google Cloud Logging client
 // for Go Cloud Functions and services.
 //
 // Quick start:
@@ -6,7 +6,7 @@
 //  package main
 //
 //  import (
-//      v2 "github.com/print-engine/utils-golang/logv2"
+//      logger "github.com/print-engine/ieos-golang-utils/logger"
 //      "cloud.google.com/go/logging"
 //      "context"
 //      "fmt"
@@ -18,15 +18,15 @@
 //  func MyFunc(w http.ResponseWriter, r *http.Request) {
 //      ctx := context.Background()
 //
-//      lg, err := v2.New(ctx,
-//          v2.WithInvoker("my-func"),
-//          v2.WithLogName("MyService"),
-//          // v2.WithProjectID(os.Getenv("GOOGLE_CLOUD_PROJECT")), // optional; auto-detected if omitted
-//          v2.WithCommonLabels(map[string]string{
+//      lg, err := logger.New(ctx,
+//          logger.WithInvoker("my-func"),
+//          logger.WithLogName("MyService"),
+//          // logger.WithProjectID(os.Getenv("GOOGLE_CLOUD_PROJECT")), // optional; auto-detected if omitted
+//          logger.WithCommonLabels(map[string]string{
 //              "service": "my-func",
 //              "env":     os.Getenv("ENVIRONMENT"),
 //          }),
-//          // v2.WithNotifier(mySlackNotifier{}, logging.Error), // optional
+//          // logger.WithNotifier(mySlackNotifier{}, logging.Error), // optional
 //      )
 //      if err != nil { fmt.Fprintln(w, err); return }
 //      defer lg.Close()
@@ -44,7 +44,7 @@
 //  func (mySlackNotifier) Notify(ctx context.Context, severity logging.Severity, executionID string, message string, payload any) {
 //      // send to Slack, etc.
 //  }
-package logv2
+package logger
 
 import (
 	cloudmeta "cloud.google.com/go/compute/metadata"
