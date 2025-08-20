@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	slackClient   *slack.Client
+	slackClient    *slack.Client
 	isSlackEnabled bool
 )
 
@@ -75,22 +75,4 @@ func SendMessage(channelID, message string) (string, error) {
 		return "", fmt.Errorf("failed to send slack message: %v", err)
 	}
 	return timestamp, nil
-}
-
-func SendWarningMessage(message string) (string, error) {
-	channelID := os.Getenv("SLACK_WARNING_CHANNEL_ID")
-	if channelID == "" {
-		return "", fmt.Errorf("SLACK_WARNING_CHANNEL_ID environment variable is not set")
-	}
-	warningMessage := fmt.Sprintf("⚠️ WARNING\n\n%s", message)
-	return SendMessage(channelID, warningMessage)
-}
-
-func SendErrorMessage(message string) (string, error) {
-	channelID := os.Getenv("SLACK_ERROR_CHANNEL_ID")
-	if channelID == "" {
-		return "", fmt.Errorf("SLACK_ERROR_CHANNEL_ID environment variable is not set")
-	}
-	errorMessage := fmt.Sprintf("🚨 ERROR\n\n%s", message)
-	return SendMessage(channelID, errorMessage)
 }
