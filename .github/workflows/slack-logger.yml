@@ -19,6 +19,8 @@ permissions:
 
 jobs:
   deploy_dev:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     if: ${{ inputs.environment == 'dev' }}
     steps:
     - uses: actions/checkout@v4
