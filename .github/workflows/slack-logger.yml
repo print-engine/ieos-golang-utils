@@ -40,7 +40,7 @@ jobs:
             --gen2 \
             --region=us-central1 \
             --runtime=go121 \
-            --entry-point=SendMessage \
+            --entry-point=HandleLogAlert \
             --trigger-topic="ieos-platform-dev-logs" \
             --source=./ieos-slack-logger \
             --service-account="ieos-platform-dev-logs-fn@ieos-platform-dev.iam.gserviceaccount.com" \
