@@ -20,19 +20,27 @@ permissions:
 jobs:
   deploy_dev:
     if: ${{ inputs.environment == 'dev' }}
-    uses: print-engine/devops-ieos-platform/.github/workflows/deploy.yaml@main
-    with:
-      workload_identity_provider_variable_name: WORKLOAD_IDENTITY_PROVIDER
-      service_account_variable_name: SERVICE_ACCOUNT
-      environment: dev
-      deploy_command: |
-        gcloud functions deploy ieos-platform-dev-logs-handler \
-          --gen2 \
-          --runtime=go121 \
-          --entry-point=SendMessage \
-          --trigger-topic="ieos-platform-dev-logs" \
-          --source=./ieos-slack-logger \
-          --service-account="ieos-platform-dev-logs-fn@ieos-platform-dev.iam.gserviceaccount.com" \
-          --memory=256Mi \
-          --timeout=60s \
-          --ingress-settings=internal-only 
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: google-github-actions/auth@v2
+      id: auth
+      with:
+        token_format: 'access_token'
+        workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+        service_account: ${{ vars.SERVICE_ACCOUNT }}
+        export_environment_variables: true
+        create_credentials_file: true
+      
+    - name: Deploy Slack Logger
+      run: |
+          gcloud functions deploy ieos-platform-dev-logs-handler \
+            --gen2 \
+            --runtime=go121 \
+            --entry-point=SendMessage \
+            --trigger-topic="ieos-platform-dev-logs" \
+            --source=./ieos-slack-logger \
+            --service-account="ieos-platform-dev-logs-fn@ieos-platform-dev.iam.gserviceaccount.com" \
+            --memory=256Mi \
+            --timeout=60s \
+            --ingress-settings=internal-only 
